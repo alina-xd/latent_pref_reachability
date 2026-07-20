@@ -175,11 +175,19 @@ def render_state(state, v, dt, emoji, dpi):
         (-HALF_W, -HALF_H), 2 * HALF_W, SIDEWALK_H,
         facecolor=SIDEWALK_COLOR, edgecolor="none", zorder=1))
 
-    # red central obstacle (the tree emoji is composited on top in pixel space)
+    # red central obstacle
     ax.add_patch(patches.Circle(
         (0.0, 0.0), OBS_R, facecolor=RED, edgecolor="none", zorder=2))
 
-    # car: top-down icon (body + windshields + wheels), front along theta
+    # tree emoji drawn INSIDE the axes, above the obstacle but BELOW the car
+    # (zorder 2.5), so the car is never hidden by the tree at the obstacle centre
+    if emoji is not None:
+        tw = 0.8 * OBS_R  # half-width = 80% of the obstacle radius
+        ax.imshow(np.asarray(emoji.convert("RGBA")),
+                  extent=[-tw, tw, -tw, tw], zorder=2.5, interpolation="bilinear")
+        ax.set_xlim([-HALF_W, HALF_W]); ax.set_ylim([-HALF_H, HALF_H])
+
+    # car: top-down icon (body + windshields + wheels), front along theta -> on top
     draw_car(ax, x, y, theta)
 
     fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
@@ -189,11 +197,6 @@ def render_state(state, v, dt, emoji, dpi):
     plt.close(fig)
     buf.seek(0)
     img = Image.open(buf).convert("RGB")
-
-    # scale the emoji to ~80% of the obstacle diameter in pixels
-    obstacle_diam_px = (2 * OBS_R) / (2 * HALF_W) * img.size[0]
-    img = composite_tree(img, emoji, 0.8 * obstacle_diam_px)
-
     return np.array(img)
 
 

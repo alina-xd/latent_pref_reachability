@@ -146,7 +146,7 @@ def main(a):
     out = {"imgs": imgs, "obs_state": obs_state, "priv": priv, "margin": margin,
            "pairs": pairs, "label": label, "category": cat,
            "pref_profile": a.pref_profile, "weights": weights, "R": R, "SW": SW}
-    op = a.out or f"dubins_pref_{a.pref_profile}_{a.dpi}.pkl"
+    op = a.out or f"data/pref_labels_{a.pref_profile}.pkl"
     with open(op, "wb") as f:
         pickle.dump(out, f)
     print(f"[pref-gen] saved -> {op}  ({os.path.getsize(op)/1e6:.1f} MB)")
