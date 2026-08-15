@@ -18,8 +18,7 @@ safe/fail classification, but which failure mode and which safe behavior is pref
 Each notebook opens with a markdown cell explaining what it does and embeds its key figures (so it reads correctly without rerunning).
 
 ## Virtual environment
-A single conda env, `reach_pref`, runs all four notebooks (torch 2.7 + CUDA, DreamerV3, DINOv2,
-transformers 5.14 with Qwen3-VL). Create it from the pinned spec and register its Jupyter kernel:
+A single conda env, `reach_pref`, runs all four notebooks. Create it with the following commands:
 
 ```bash
 conda env create -f environment.yml
