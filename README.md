@@ -25,7 +25,7 @@ Gemini labeling (egg) requires your own Gemini API key. Place `KEY=<your_api_key
 ```
 01_…04_*.ipynb        the four notebooks live at the root
 dubins/               shared Dubins code (DreamerV3, safety_rl, the generate_* scripts)
-egg/                  all egg code + egg data (self-contained, see egg/README.md)
+egg/                  all egg code
 ```
 
 ## Getting the data & checkpoints
