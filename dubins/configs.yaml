@@ -1,0 +1,159 @@
+defaults:
+
+  logdir: 'logs/dreamer_dubins' 
+  traindir: null
+  evaldir: null
+  offline_traindir: ''
+  offline_evaldir: ''
+  seed: 0
+  deterministic_run: False
+  steps: 1e6
+  parallel: False
+  eval_every: 1e4
+  eval_episode_num: 10
+  log_every: 1e4
+  reset_every: 0
+  device: 'cuda:0'
+  compile: True
+  precision: 32
+  debug: False
+  video_pred_log: True
+
+  num_exp_trajs: 4900 #1900 in paper
+  pretrain_steps: 50000 # 100000 in paper
+  
+  # Environment
+  task: 'dubins'
+  size: [128, 128]
+  envs: 1
+  action_repeat: 1
+  time_limit: 100
+  grayscale: False
+  prefill: 5000
+  reward_EMA: True
+
+  # Model
+  dyn_hidden: 512
+  dyn_deter: 512
+  dyn_stoch: 32
+  dyn_discrete: 0 # 0 for continuous latent
+  dyn_rec_depth: 1
+  dyn_mean_act: 'none'
+  dyn_std_act: 'sigmoid2'
+  dyn_min_std: 0.1
+  grad_heads: ['decoder']
+  units: 512
+  act: 'SiLU'
+  norm: True
+  encoder:
+    {mlp_keys: 'obs_state', cnn_keys: 'image', act: 'SiLU', norm: True, cnn_depth: 32, kernel_size: 4, minres: 4, mlp_layers: 5, mlp_units: 1024, symlog_inputs: True}
+  decoder:
+    {mlp_keys: 'obs_state', cnn_keys: 'image', act: 'SiLU', norm: True, cnn_depth: 32, kernel_size: 4, minres: 4, mlp_layers: 5, mlp_units: 1024, cnn_sigmoid: False, image_dist: mse, vector_dist: symlog_mse, outscale: 1.0}
+  actor:
+    {layers: 2, dist: 'normal', entropy: 3e-4, unimix_ratio: 0.01, std: 'learned', min_std: 0.1, max_std: 1.0, temp: 0.1, lr: 3e-5, eps: 1e-5, grad_clip: 100.0, outscale: 1.0}
+  critic:
+    {layers: 2, dist: 'symlog_disc', slow_target: True, slow_target_update: 1, slow_target_fraction: 0.02, lr: 3e-5, eps: 1e-5, grad_clip: 100.0, outscale: 0.0}
+  reward_head:
+    {layers: 2, dist: 'symlog_disc', loss_scale: 1.0, outscale: 0.0}
+  cont_head:
+    {layers: 2, loss_scale: 1.0, outscale: 1.0}
+  # margin head: jointly regress the weighted signed-distance failure margin
+  # (True: WorldModel builds wm.heads['margin']; downstream RL uses it as l(x))
+  use_margin_head: False
+  margin_head:
+    {layers: 2, dist: 'symlog_mse', loss_scale: 10.0, outscale: 1.0}
+  dyn_scale: 0.5
+  rep_scale: 0.1
+  kl_free: 1.0
+  weight_decay: 0.0
+  unimix_ratio: 0.01
+  initial: 'learned'
+
+  # Training
+  batch_size: 16
+  batch_length: 64
+  train_ratio: 512
+  pretrain: 100
+  model_lr: 1e-4
+  obs_lr: 1e-3
+  lx_lr: 1e-4
+  opt_eps: 1e-8
+  grad_clip: 1000
+  dataset_size: 1000000
+  opt: 'adam'
+
+  # Behavior.
+  discount: 0.997
+  discount_lambda: 0.95
+  imag_horizon: 15
+  imag_gradient: 'dynamics'
+  imag_gradient_mix: 0.0
+  eval_state_mean: False
+
+  # Exploration
+  expl_behavior: 'greedy'
+  expl_until: 0
+  expl_extr_scale: 0.0
+  expl_intr_scale: 1.0
+  disag_target: 'stoch'
+  disag_log: True
+  disag_models: 10
+  disag_offset: 1
+  disag_layers: 4
+  disag_units: 400
+  disag_action_cond: False
+
+  # RARL parameters
+  doneType: toEnd
+  costType: sparse
+  randomSeed: 0
+  consRadius: 0.5
+  speed: 1.
+  warmup: true
+  warmupIter: 500
+  maxUpdates: 500000
+  updateTimes: 20
+  memoryCapacity: 10000
+  checkPeriod: 10000   # 50 evenly-spaced checkpoints kept over the run (MAX_MODEL=50) for eval-based selection
+
+  annealing: False   # constant gamma + no cyclic eps-reset (was True) to avoid pessimistic divergence
+  architecture: [100, 100]
+  learningRate: 1e-3
+  gamma: 0.9         # ~10-step horizon, matching the reliable imagination window (was 0.95->anneal 0.99)
+  actType: Tanh
+  mode: RA
+  terminalType: g
+  showTime: null
+  name: null
+  outFolder: logs/experiments_pref
+  plotFigure: null
+  storeFigure: True
+  wm: True
+  # num datapts for training encoder, transition, classifier
+  num_pts: 5000 # 2000 in paper
+
+  grid_path: data/LS_BRT_v1_w1.25.npy
+  dataset_path: data/wm_training_data.pkl
+  # HJ computation bounds
+  x_min: -1.1
+  x_max: 1.1
+  y_min: -1.1
+  y_max: 1.1
+  dt: 0.05
+  numT: 10   # shorter rollout: keep DDQN in the WM's reliable imagination horizon
+  nx: 51
+  ny: 51
+  nz: 51
+
+  obs_x: 0
+  obs_y: 0
+  obs_r: 0.5
+
+  # Dubins car parameters
+  turnRate: 1.25
+  num_actions: 3
+
+  gamma_lx: 0.75
+
+  wm_checkpoint: checkpoints/wm_transition_only.pt
+  lx_checkpoint: checkpoints/pref_margin_head_set_a.pt
