@@ -34,7 +34,7 @@ Then select the `reach_pref` kernel in the notebooks. A CUDA GPU is required. Ge
 01_…04_*.ipynb        the four notebooks live at the root
 environment.yml       the env dependencies for running the code
 dubins/               shared Dubins code (DreamerV3, safety_rl, the generate_* scripts)
-egg/                  all egg code + egg data (self-contained, see egg/README.md)
+egg/                  all egg code
 ```
 
 ## Getting the data & checkpoints
