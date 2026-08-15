@@ -17,13 +17,22 @@ safe/fail classification, but which failure mode and which safe behavior is pref
 
 Each notebook opens with a markdown cell explaining what it does and embeds its key figures (so it reads correctly without rerunning).
 
-## Virutal environment
-A single conda env, `reach_pref`, runs all four notebooks. Select the `reach_pref` Jupyter kernel.
-Gemini labeling (egg) requires your own Gemini API key. Place `KEY=<your_api_key>` in `~/.gemini_key`. The Dubins VLM labeler (Qwen3-VL) runs locally on GPU, no key needed.
+## Virtual environment
+A single conda env, `reach_pref`, runs all four notebooks (torch 2.7 + CUDA, DreamerV3, DINOv2,
+transformers 5.14 with Qwen3-VL). Create it from the pinned spec and register its Jupyter kernel:
+
+```bash
+conda env create -f environment.yml
+conda activate reach_pref
+python -m ipykernel install --user --name reach_pref
+```
+
+Then select the `reach_pref` kernel in the notebooks. A CUDA GPU is required. Gemini labeling (egg) requires your own Gemini API key. Put `KEY=<your_api_key>` in `~/.gemini_key`. The Dubins VLM labeler (Qwen3-VL) runs locally on GPU, no key needed.
 
 ## Layout
 ```
 01_…04_*.ipynb        the four notebooks live at the root
+environment.yml       the env dependencies for running the code
 dubins/               shared Dubins code (DreamerV3, safety_rl, the generate_* scripts)
 egg/                  all egg code + egg data (self-contained, see egg/README.md)
 ```
